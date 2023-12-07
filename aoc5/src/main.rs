@@ -1,7 +1,10 @@
 use std::fs::File;
 use std::io::Read;
+use std::thread;
+use std::thread::JoinHandle;
+use std::sync::Arc;
 
-#[derive(Debug,PartialEq)]
+#[derive(Debug,PartialEq,Clone)]
 struct Mapping {
     mapping: Vec<(isize, isize, isize)>,
 }
@@ -29,7 +32,7 @@ impl Mapping {
     }
 }
 
-fn find_min(seeds: Vec<isize>, mappings: &Vec<Mapping>) -> isize {
+fn find_min(seeds: Vec<isize>, mappings: Arc<Vec<Mapping>>) -> isize {
     let mut res: Vec<isize> = Vec::new();
     for seed in seeds {
         let mut loc = seed;
@@ -54,21 +57,23 @@ fn aoc(input: &str) -> (isize, isize) {
         }
         mappings.push(mapping);
     }
-    let mut min_second = std::u32::MAX as isize;
 
+    let new_mapping = Arc::new(mappings.clone());
+    let mut handles: Vec<JoinHandle<_>> = Vec::new();
     for i in (0..seeds.len()).step_by(2) {
-        println!("Start seed");
         let mut new_seeds: Vec<isize> = Vec::new();
-        for j in seeds[i]..(seeds[i] + seeds[i+1]) {
+        for (c, j) in (seeds[i]..(seeds[i] + seeds[i+1])).enumerate() {
             new_seeds.push(j);
+            if c % 5000000 == 0 || j == (seeds[i] + seeds[i+1] -1) {
+                let new_mapping = Arc::clone(&new_mapping);
+                handles.push(thread::spawn(move || find_min(new_seeds, new_mapping)));
+                new_seeds = Vec::new();
+            }
         }
-        let new_min = find_min(new_seeds, &mappings);
-        if new_min < min_second {
-            min_second = new_min;
-        }
+        println!("{} threads", handles.len());
     }
 
-    return (find_min(seeds, &mappings), min_second);
+    return (find_min(seeds, Arc::new(mappings.clone())), handles.into_iter().map(|x| x.join().unwrap()).min().unwrap());
 }
 
 fn main() {
