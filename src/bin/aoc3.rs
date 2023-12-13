@@ -1,6 +1,9 @@
-use std::fs::File;
-use std::io::Read;
 use std::collections::HashSet;
+use aoc::{input, split_input, display};
+
+fn main() {
+    display(aoc(&input(2023, 3)));
+}
 
 #[derive(Debug,PartialEq)]
 struct Number {
@@ -64,7 +67,7 @@ fn aoc(input: &str) -> (u32, u32) {
     let mut numbers: Vec<Number> = Vec::new();
     let mut symbols:HashSet<(isize, isize)> = HashSet::new();
     let mut gears:Vec<(isize, isize)> = Vec::new();
-    for (line_nbr, line) in input.split("\n").map(|x| x.trim()).enumerate() {
+    for (line_nbr, line) in split_input(input).iter().enumerate() {
         let new_line = line.to_string() + "."; // add empty to make sure to add number a the end of the line
         let mut number = Number::new();
         for (col_nbr, symbol) in new_line.chars().enumerate() {
@@ -99,12 +102,4 @@ fn aoc(input: &str) -> (u32, u32) {
                           .sum();
 
     return (sum, sum_second);
-}
-
-fn main() {
-    let mut file = File::open("input.txt").expect("File not found");
-    let mut contents = String::new();
-    file.read_to_string(&mut contents).expect("Error while reading file");
-    let result = aoc(&contents);
-    println!("{}    {}", result.0, result.1);
 }

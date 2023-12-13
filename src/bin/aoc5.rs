@@ -1,8 +1,11 @@
-use std::fs::File;
-use std::io::Read;
 use std::thread;
 use std::thread::JoinHandle;
 use std::sync::Arc;
+use aoc::{input, display};
+
+fn main() {
+    display(aoc(&input(2023, 5)));
+}
 
 #[derive(Debug,PartialEq,Clone)]
 struct Mapping {
@@ -75,15 +78,3 @@ fn aoc(input: &str) -> (isize, isize) {
 
     return (find_min(seeds, Arc::new(mappings.clone())), handles.into_iter().map(|x| x.join().unwrap()).min().unwrap());
 }
-
-fn main() {
-    let mut file = File::open("input.txt").expect("File not found");
-    let mut contents = String::new();
-    file.read_to_string(&mut contents).expect("Error while reading file");
-    let result = aoc(&contents);
-    println!("{}    {}", result.0, result.1);
-}
-
-
-//TODO split range 
-// process range per range

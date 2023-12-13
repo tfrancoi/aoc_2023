@@ -1,7 +1,10 @@
-use std::fs::File;
-use std::io::Read;
 use std::cmp::Ordering;
 use itertools::Itertools;
+use aoc::{input, split_input, display};
+
+fn main() {
+    display(aoc(&input(2023, 7)));
+}
 
 #[derive(Eq, Debug)]
 struct Hand {
@@ -77,20 +80,12 @@ impl PartialEq for Hand {
 fn aoc(input: &str) -> (usize, usize) {
     let mut hands: Vec<Hand> = Vec::new();
     let mut hands_joker: Vec<Hand> = Vec::new();
-    for line in input.split("\n") {
-        hands.push(Hand::new(line, false));
-        hands_joker.push(Hand::new(line, true));
+    for line in split_input(input) {
+        hands.push(Hand::new(&line, false));
+        hands_joker.push(Hand::new(&line, true));
     }
     (
         hands.iter().sorted().enumerate().map(|(i, hand)| (i + 1) * hand.bid).sum(),
         hands_joker.iter().sorted().enumerate().map(|(i, hand)| (i + 1) * hand.bid).sum()
     )
-}
-
-fn main() {
-    let mut file = File::open("input.txt").expect("File not found");
-    let mut contents = String::new();
-    file.read_to_string(&mut contents).expect("Error while reading file");
-    let result = aoc(&contents);
-    println!("{}    {}", result.0, result.1);
 }

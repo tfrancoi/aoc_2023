@@ -1,5 +1,8 @@
-use std::fs::File;
-use std::io::Read;
+use aoc::{input, split_input, display};
+
+fn main() {
+    display(aoc(&input(2023, 1)));
+}
 
 fn replace(line: &str) -> String {
     line.replace("one", "o1e")
@@ -19,18 +22,5 @@ fn get_number(line: &str) -> u32 {
 }
 
 fn aoc(input: &str) -> (u32, u32) {
-    let mut sum: u32 = 0;
-    let mut sum_second: u32 = 0;
-    for line in input.split("\n").map(|x| x.trim()) {
-        sum += get_number(line);
-        sum_second += get_number(&replace(line));
-    }
-    return (sum, sum_second);
-}
-
-fn main() {
-    let mut file = File::open("input.txt").expect("File not found");
-    let mut contents = String::new();
-    file.read_to_string(&mut contents).expect("Error while reading file");
-    println!("{:?}", aoc(&contents));
+    split_input(input).into_iter().fold((0, 0), |(a, b), line| (a + get_number(&line), b + get_number(&replace(&line))))
 }
